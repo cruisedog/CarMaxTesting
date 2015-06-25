@@ -1,139 +1,105 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.IE;
 using OpenQA.Selenium.Support.UI;
-using System.Text.RegularExpressions;
-using System.Threading;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
-namespace CarmaxTest
+
+namespace CarMaxTests
 {
     [TestClass]
     public class UnitTest1
     {
+        private IWebDriver _driver;
 
-        //Creates the refernce for our browser. In this case using Internet Exploder.
-        IWebDriver driver = new InternetExplorerDriver(@"C:\Users\Perry\Desktop");
-
-        static void Main(string[] args)
+        public UnitTest1()
         {
 
+
         }
-         [SetUp]
+
+        [SetUp]
         public void Initialize()
         {
-            //Navigate to Carfax
-            driver.Navigate().GoToUrl("http://www.carmax.com/");
-            Console.WriteLine("Opened URL");
+
         }
+
 
         [TestMethod]
-        public void TestMethod1() //Execute
+        public void TestMethod1()
         {
+            //_driver = new InternetExplorerDriver(@".");
+
+            _driver = new ChromeDriver(@".");
+
             //Navigate to Carfax
-            driver.Navigate().GoToUrl("http://www.carmax.com/");
+            _driver.Navigate().GoToUrl("http://www.carmax.com/");
+
+            new WebDriverWait(_driver, TimeSpan.FromSeconds(15)).Until(ExpectedConditions.ElementExists((By.ClassName("page"))));
+
             Console.WriteLine("Opened URL");
             //Finds the Search box
-            IWebElement searchInput = driver.FindElement(By.Id("search"));
-          
+            IWebElement searchInput = _driver.FindElement(By.Id("search"));
+
             //Enters you text you want in the search box
             searchInput.SendKeys("jeep");
+
             //Clicks enter to what ever you put in the search box
             searchInput.SendKeys(Keys.Enter);
-            //Click the radius and zip code
 
-            //driver.FindElement(By.Id("dLabel")).FindElement(By.Id("dropdown-menu")).Click();
-            //driver.FindElement(By.LinkText("75 miles")).Click();
-
-            //IWebElement dropDownListBox = driver.FindElement(By.Id("dLabel"));
-            //SelectElement clickThis = new SelectElement(dropDownListBox);
-            //clickThis.SelectByText("500 miles");
-
-            // IWebElement dropDownListBox = driver.FindElement(By.Id("selectedDistanceDesc"));
-
-            //new SelectElement(driver.FindElement(By.Id("selectedDistanceDesc"))).SelectByIndex(3);
-
-            //SelectElement clickThis = new SelectElement(dropDownListBox);
-            //clickThis.SelectByText("500 miles");
-
-            //
-            //driver.FindElement(By.Name("dLabel")).Click();
+            // Car Features
 
 
-            //driver.FindElement(By.Id("dLabel")).Click();
-            //driver.FindElement(By.LinkText("500 miles")).Click();
-            //driver.FindElement(By.Id("zip")).Clear();
-            //driver.FindElement(By.Id("zip")).SendKeys("76513");
-            //driver.FindElement(By.Id("distanceSubmit")).Click();
-            //Clicking the milage drop down
-            //driver.FindElement(By.Id("mileageFilter"));//.SelectByText("30,000 or less");
-            //driver.FindElement(By.Id("30,000 or less"));
+            //********************* Exterior Color Div Click Down ********
+            //*************Use Code to as a div drop down
+            _driver.FindElement(By.Id("Exterior Color")).Click();
 
-            driver.FindElement(By.XPath("//button[contains(.,'    any distance    ')]"));
-
-            //driver.FindElement(By.XPath("//Input[@id='r_780]"));
-
-            //IWebElement checkBox1;
-            //IWebElement checkBox3;
+            //Exterior Color Choice
+            // Color set to first choice black
+            IWebElement ExteriorColor = _driver.FindElement(By.XPath(".//*[@id='r_4294963167']"));
+            ExteriorColor.Click();
 
 
+            //20inch plus wheels option box
+            _driver.FindElement(By.Id("r_811")).Click();
+            //Air Conditioning option box
+            _driver.FindElement(By.Id("r_780")).Click();
+            //Automatic Transmisson
+            _driver.FindElement(By.Id("r_781")).Click();
 
-            //checkBox1 = driver.FindElement(By.CssSelector("input[value='cb1']"));
-           // checkBox3 = driver.FindElement(By.CssSelector("input[value='cb3']"));
 
-          //  if (!checkBox1.isSelected())
-           // {
-          //      checkBox1.click();
-           // }
+            //Mile radius and Area code check boxes
+            //IWebElement dropDownListBox = _driver.FindElement(By.Id("selectedDistanceDesc"));
+            IWebElement drop = _driver.FindElement(By.Id("dLabel"));
+            drop.Click();
+            //Selected Distance
+            _driver.FindElement(By.CssSelector("#distance > li:nth-child(5) > a")).Click();
+            //testing zip
+            IWebElement Zip = _driver.FindElement(By.CssSelector("#zip"));
+            Zip.SendKeys("76504");
+            Zip.SendKeys(Keys.Enter);
 
-            //checkBox3 is selected by default
-          //  if (checkBox3.isSelected())
-          //  {
-           //     checkBox3.click();
-          //  }
+            _driver.FindElement(By.Id("zip")).Clear();
+            _driver.FindElement(By.Id("zip")).SendKeys("76504");
 
-          //  driver.FindElement(By.Id("r_780")).Click();
-          //  driver.FindElement(By.Id("r_819")).Click();
-            
-            //SoftVerifier.Equals("http://img2.carmax.com/image/10934098/216/162");
-            
+            //Update button
+            _driver.FindElement(By.Id("distanceSubmit")).Click();
+
+            string value = _driver.FindElement(By.CssSelector("#resultsHeader > h1")).Text;
+
+            Console.WriteLine(String.Format("{0}", value));
+
+
+            // Checking to see correct cars found
+            Assert.AreEqual("1 cars found", value);
 
             Console.WriteLine("Executed Test");
+
+
+
         }
-
-        private class SoftVerifier
-        {
-            private StringBuilder verificationErrors;
-
-            public SoftVerifier()
-            {
-                verificationErrors = new StringBuilder();
-            }
-
-            public void VerifyElementIsPresent(IWebElement element)
-            {
-                if (!element.Displayed)
-                {
-                    verificationErrors.Append("Element was not displayed");
-                }
-            }
-        }
-
-         [TearDown]
-        public void CleanUp()
-        {
-            driver.Close();
-            Console.WriteLine("Closed Browser");
-        }
-
     }
 }
-
-
-
-
